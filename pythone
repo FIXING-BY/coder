@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Studio Pro</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material-ocean.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+    <style>
+        :root {
+            --bg: #0f111a;
+            --surface: #1a1b26;
+            --accent: #7aa2f7;
+            --success: #9ece6a;
+        }
+
+        * { box-sizing: border-box; outline: none; }
+        body, html {
+            margin: 0; padding: 0; height: 100vh; width: 100vw;
+            background-color: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden;
+        }
+
+        .app-wrapper { display: flex; flex-direction: column; height: 100vh; }
+
+        .navbar {
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 25px; background: var(--surface);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo { font-weight: 600; color: var(--accent); font-size: 1.1rem; }
+        .actions { display: flex; gap: 10px; }
+
+        .btn {
+            padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer;
+            font-weight: 600; font-family: inherit; transition: 0.2s;
+            display: flex; align-items: center; gap: 8px; font-size: 13px;
+        }
+
+        .btn-primary { background: var(--success); color: #0f111a; }
+        .btn-secondary { background: rgba(255,255,255,0.05); color: white; }
+
+        .editor-area { flex-grow: 1; }
+        .CodeMirror { height: 100% !important; font-family: 'Fira Code', monospace; font-size: 16px; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 100;
+        }
+        .modal { background: var(--surface); padding: 30px; border-radius: 20px; width: 320px; }
+        .modal input {
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2); color: white; margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <div class="navbar">
+        <div class="logo">PYTHON STUDIO</div>
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="openModal()">💾 Kaydet</button>
+            <button id="run-btn" class="btn btn-primary" onclick="runInNewWindow()">▶ Çalıştır</button>
+        </div>
+    </div>
+
+    <div class="editor-area">
+        <textarea id="editor"># Sadece sonucu görmek için çalıştır
+print("Merhaba Dünya!")
+print(50 * 2)</textarea>
+    </div>
+</div>
+
+<div class="modal-overlay" id="overlay">
+    <div class="modal">
+        <h3 style="margin:0; color:white;">Dosya Adı</h3>
+        <input type="text" id="filename" value="script">
+        <div style="display:flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+            <button class="btn btn-primary" onclick="downloadFile()">İndir</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+
+<script>
+    const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+        mode: "python", theme: "material-ocean", lineNumbers: true, autoCloseBrackets: true
+    });
+
+    let pyodideInstance = null;
+    async function initPyodide() { pyodideInstance = await loadPyodide(); }
+    initPyodide();
+
+    async function runInNewWindow() {
+        if (!pyodideInstance) return alert("Yükleniyor...");
+        const code = editor.getValue();
+        
+        try {
+            pyodideInstance.runPython(`import sys, io\nsys.stdout = io.StringIO()`);
+            await pyodideInstance.runPythonAsync(code);
+            const stdout = pyodideInstance.runPython("sys.stdout.getvalue()");
+
+            const resWin = window.open('', '_blank');
+            resWin.document.write(`
+                <body style="background:#0f111a; color:#cfc9c2; font-family:monospace; padding:20px; white-space:pre-wrap;">${stdout || 'Sonuç yok.'}</body>
+            `);
+            resWin.document.close();
+        } catch (err) {
+            const errWin = window.open('', '_blank');
+            errWin.document.write(`<body style="background:#1a1b26; color:#f7768e; font-family:monospace; padding:20px;">${err}</body>`);
+            errWin.document.close();
+        }
+    }
+
+    const overlay = document.getElementById('overlay');
+    function openModal() { overlay.style.display = 'flex'; }
+    function closeModal() { overlay.style.display = 'none'; }
+    function downloadFile() {
+        const code = editor.getValue();
+        let name = document.getElementById('filename').value || "script";
+        if(!name.endsWith('.py')) name += '.py';
+        const blob = new Blob([code], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = name; a.click();
+        closeModal();
+    }
+</script>
+</body>
+</html>
