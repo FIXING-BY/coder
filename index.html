@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fixing Coder | Premium</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #080808;
-            --card-bg: #121212;
+            --bg: #050505;
+            --card-bg: #0f0f0f;
             --accent: #ffffff;
-            --text-main: #e0e0e0;
-            --text-dim: #666;
-            --code-color: #a9dc76; /* Modern yeşilimsi kod rengi */
+            --text-main: #ffffff;
+            --text-dim: #888;
+            --code-color: #a9dc76;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,7 +26,7 @@
             overflow: hidden;
         }
 
-        /* --- MODERN GİRİŞ EKRANI --- */
+        /* --- DEVASA GİRİŞ EKRANI --- */
         #welcome-screen {
             height: 100vh;
             display: flex;
@@ -37,62 +37,58 @@
         }
 
         .brand-logo {
-            font-size: 3.5rem;
-            font-weight: 600;
-            letter-spacing: -1px;
-            margin-bottom: 10px;
-            background: linear-gradient(to bottom, #fff 30%, #444 100%);
+            font-size: 6rem; /* Devasa Logo */
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 5px;
+            background: linear-gradient(to bottom, #fff 40%, #333 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .subtitle {
             color: var(--text-dim);
-            margin-bottom: 60px;
-            font-weight: 300;
-            letter-spacing: 4px;
+            margin-bottom: 80px;
+            font-weight: 400;
+            letter-spacing: 8px;
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 1.2rem;
         }
 
         .grid-menu {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-            max-width: 1000px;
+            gap: 40px;
+            width: 90%;
+            max-width: 1400px;
         }
 
         .option-card {
             background: var(--card-bg);
             border: 1px solid #1a1a1a;
-            padding: 40px 30px;
-            width: 180px;
+            padding: 80px 40px; /* Çok daha büyük kartlar */
             text-align: center;
-            border-radius: 20px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .option-card:hover {
-            border-color: #444;
-            transform: translateY(-10px);
-            background: #181818;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: #fff;
+            transform: translateY(-20px) scale(1.05);
+            background: #151515;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
         }
 
         .option-card h3 {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--text-main);
+            font-size: 2.5rem; /* Büyük harfler */
+            font-weight: 700;
+            margin-bottom: 10px;
         }
 
         .option-card span {
-            font-size: 0.7rem;
+            font-size: 1rem;
             color: var(--text-dim);
-            display: block;
-            margin-top: 8px;
         }
 
         /* --- FULL EKRAN KOD PANELİ --- */
@@ -102,101 +98,90 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: #050505;
-            transform: scale(1.1);
+            background: #000;
+            transform: translateY(100%);
             opacity: 0;
-            pointer-events: none;
-            transition: all 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+            transition: all 0.7s cubic-bezier(0.85, 0, 0.15, 1);
             z-index: 100;
         }
 
         #app-screen.active {
-            transform: scale(1);
+            transform: translateY(0);
             opacity: 1;
-            pointer-events: all;
         }
 
-        /* Yüzen Menü Butonu */
+        /* Köşedeki Menü Tuşu */
         .float-menu {
             position: fixed;
-            top: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
+            top: 40px;
+            right: 40px;
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+            border-radius: 20px;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 4px;
             cursor: pointer;
             z-index: 200;
             transition: 0.3s;
+            font-size: 30px;
         }
 
         .float-menu:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: rotate(90deg);
+            background: #fff;
+            color: #000;
         }
-
-        .dot { width: 4px; height: 4px; background: #fff; border-radius: 50%; }
 
         .code-wrapper {
             width: 100%;
             height: 100%;
-            padding: 60px;
+            padding: 80px;
             overflow: auto;
         }
 
         pre {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 17px;
-            line-height: 1.8;
+            font-size: 22px; /* Daha büyük kod fontu */
+            line-height: 1.6;
             color: var(--code-color);
             white-space: pre-wrap;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div id="welcome-screen">
         <h1 class="brand-logo">FIXING CODER</h1>
-        <p class="subtitle">Select Environment</p>
+        <p class="subtitle">System Ready</p>
         
         <div class="grid-menu">
-            <div class="option-card" onclick="launch('c.txt')">
+            <div class="option-card" onclick="launch('c')">
                 <h3>C</h3>
-                <span>Low-level code</span>
+                <span>Kernel Source</span>
             </div>
-            <div class="option-card" onclick="launch('html.txt')">
+            <div class="option-card" onclick="launch('html')">
                 <h3>HTML</h3>
-                <span>Web structure</span>
+                <span>Web Core</span>
             </div>
-            <div class="option-card" onclick="launch('java.txt')">
+            <div class="option-card" onclick="launch('java')">
                 <h3>JAVA</h3>
-                <span>Enterprise apps</span>
+                <span>Objects</span>
             </div>
-            <div class="option-card" onclick="launch('pythone.txt')">
+            <div class="option-card" onclick="launch('pythone')">
                 <h3>PYTHON</h3>
-                <span>Scripting AI</span>
+                <span>Logic Script</span>
             </div>
         </div>
     </div>
 
     <div id="app-screen">
-        <div class="float-menu" onclick="closeApp()">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div>
-        
+        <div class="float-menu" onclick="closeApp()">✕</div>
         <div class="code-wrapper">
             <pre id="code-content"></pre>
         </div>
@@ -206,20 +191,34 @@
         const app = document.getElementById('app-screen');
         const content = document.getElementById('code-content');
 
-        function launch(file) {
-            fetch(file)
+        function launch(lang) {
+            const fileName = lang + ".txt";
+            fetch(fileName)
                 .then(res => res.text())
                 .then(data => {
                     content.textContent = data;
                     app.classList.add('active');
+                    
+                    // URL Uzantısını Değiştirme (Örn: /pythone)
+                    window.history.pushState({page: lang}, "", "/" + lang);
+                    document.title = "Fixing Coder | " + lang.toUpperCase();
                 })
-                .catch(() => alert("Dosya yüklenemedi."));
+                .catch(() => alert("Dosya bulunamadı."));
         }
 
         function closeApp() {
             app.classList.remove('active');
-            setTimeout(() => { content.textContent = ""; }, 600);
+            // URL'i Temizle
+            window.history.pushState({page: "home"}, "", "/");
+            document.title = "Fixing Coder";
+            setTimeout(() => { content.textContent = ""; }, 700);
         }
+
+        // Geri tuşu desteği
+        window.onpopstate = (e) => {
+            if (e.state && e.state.page !== "home") launch(e.state.page);
+            else closeApp();
+        };
     </script>
 </body>
 </html>
