@@ -3,138 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Studio Pro</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material-ocean.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
-
+    <title>Fixing Coder | Code Viewer</title>
     <style>
         :root {
-            --bg: #0f111a;
-            --surface: #1a1b26;
-            --accent: #7aa2f7;
-            --success: #9ece6a;
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --code-bg: #1e1e1e;
         }
 
-        * { box-sizing: border-box; outline: none; }
-        body, html {
-            margin: 0; padding: 0; height: 100vh; width: 100vw;
-            background-color: var(--bg); font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
 
-        .app-wrapper { display: flex; flex-direction: column; height: 100vh; }
-
-        .navbar {
-            height: 60px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 25px; background: var(--surface);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+        /* Yan Menü (Sidebar) */
+        nav {
+            width: 250px;
+            height: 100vh;
+            background-color: var(--primary-color);
+            color: white;
+            position: fixed;
+            padding-top: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
 
-        .logo { font-weight: 600; color: var(--accent); font-size: 1.1rem; }
-        .actions { display: flex; gap: 10px; }
-
-        .btn {
-            padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer;
-            font-weight: 600; font-family: inherit; transition: 0.2s;
-            display: flex; align-items: center; gap: 8px; font-size: 13px;
+        nav h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .btn-primary { background: var(--success); color: #0f111a; }
-        .btn-secondary { background: rgba(255,255,255,0.05); color: white; }
-
-        .editor-area { flex-grow: 1; }
-        .CodeMirror { height: 100% !important; font-family: 'Fira Code', monospace; font-size: 16px; }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
-            display: none; justify-content: center; align-items: center; z-index: 100;
+        nav ul {
+            list-style: none;
+            padding: 0;
         }
-        .modal { background: var(--surface); padding: 30px; border-radius: 20px; width: 320px; }
-        .modal input {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2); color: white; margin: 15px 0;
+
+        nav ul li {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        nav ul li:hover {
+            background-color: #34495e;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        nav ul li.active {
+            background-color: #34495e;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        /* Ana İçerik Alanı */
+        main {
+            margin-left: 250px;
+            padding: 40px;
+            width: 100%;
+        }
+
+        .code-container {
+            background-color: var(--code-bg);
+            color: #dcdcdc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            overflow-x: auto;
+            min-height: 400px;
+            position: relative;
+        }
+
+        pre {
+            margin: 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            line-height: 1.5;
+        }
+
+        .header-area {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
 
-<div class="app-wrapper">
-    <div class="navbar">
-        <div class="logo">PYTHON STUDIO</div>
-        <div class="actions">
-            <button class="btn btn-secondary" onclick="openModal()">💾 Kaydet</button>
-            <button id="run-btn" class="btn btn-primary" onclick="runInNewWindow()">▶ Çalıştır</button>
+    <nav>
+        <h1>Fixing Coder</h1>
+        <ul id="menu">
+            <li onclick="loadCode('c.txt', this)">C Programlama</li>
+            <li onclick="loadCode('html.txt', this)">HTML5 Yapısı</li>
+            <li onclick="loadCode('java.txt', this)">Java Sınıfları</li>
+            <li onclick="loadCode('pythone.txt', this)">Python Script</li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="header-area">
+            <div id="file-badge" class="badge">Dosya Seçiniz</div>
+            <h2 id="display-title">Kod Görüntüleyici</h2>
         </div>
-    </div>
-
-    <div class="editor-area">
-        <textarea id="editor"># Sadece sonucu görmek için çalıştır
-print("Merhaba Dünya!")
-print(50 * 2)</textarea>
-    </div>
-</div>
-
-<div class="modal-overlay" id="overlay">
-    <div class="modal">
-        <h3 style="margin:0; color:white;">Dosya Adı</h3>
-        <input type="text" id="filename" value="script">
-        <div style="display:flex; justify-content: flex-end; gap: 10px;">
-            <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
-            <button class="btn btn-primary" onclick="downloadFile()">İndir</button>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
-
-<script>
-    const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
-        mode: "python", theme: "material-ocean", lineNumbers: true, autoCloseBrackets: true
-    });
-
-    let pyodideInstance = null;
-    async function initPyodide() { pyodideInstance = await loadPyodide(); }
-    initPyodide();
-
-    async function runInNewWindow() {
-        if (!pyodideInstance) return alert("Yükleniyor...");
-        const code = editor.getValue();
         
-        try {
-            pyodideInstance.runPython(`import sys, io\nsys.stdout = io.StringIO()`);
-            await pyodideInstance.runPythonAsync(code);
-            const stdout = pyodideInstance.runPython("sys.stdout.getvalue()");
+        <div class="code-container">
+            <pre id="code-display">// Lütfen menüden bir dil seçin...</pre>
+        </div>
+    </main>
 
-            const resWin = window.open('', '_blank');
-            resWin.document.write(`
-                <body style="background:#0f111a; color:#cfc9c2; font-family:monospace; padding:20px; white-space:pre-wrap;">${stdout || 'Sonuç yok.'}</body>
-            `);
-            resWin.document.close();
-        } catch (err) {
-            const errWin = window.open('', '_blank');
-            errWin.document.write(`<body style="background:#1a1b26; color:#f7768e; font-family:monospace; padding:20px;">${err}</body>`);
-            errWin.document.close();
+    <script>
+        function loadCode(fileName, element) {
+            // Menü aktiflik durumunu güncelle
+            const items = document.querySelectorAll('#menu li');
+            items.forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+
+            // Başlık ve Badge güncelle
+            document.getElementById('display-title').innerText = fileName + " İçeriği";
+            document.getElementById('file-badge').innerText = fileName.split('.')[0].toUpperCase();
+
+            // Dosyayı Fetch API ile çekme
+            // Not: Dosyaların bu HTML ile aynı klasörde olması gerekir.
+            fetch(fileName)
+                .then(response => {
+                    if (!response.ok) throw new Error('Dosya bulunamadı');
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('code-display').textContent = data;
+                })
+                .catch(error => {
+                    document.getElementById('code-display').textContent = "Hata: " + error.message;
+                });
         }
-    }
-
-    const overlay = document.getElementById('overlay');
-    function openModal() { overlay.style.display = 'flex'; }
-    function closeModal() { overlay.style.display = 'none'; }
-    function downloadFile() {
-        const code = editor.getValue();
-        let name = document.getElementById('filename').value || "script";
-        if(!name.endsWith('.py')) name += '.py';
-        const blob = new Blob([code], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = name; a.click();
-        closeModal();
-    }
-</script>
+    </script>
 </body>
 </html>
