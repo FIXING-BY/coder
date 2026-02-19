@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Studio Pro - Fixed Bar</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material-ocean.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #0f111a;
+            --surface: #1a1b26;
+            --accent: #ff9e64;
+            --success: #7aa2f7;
+        }
+
+        * { box-sizing: border-box; outline: none; }
+        
+        /* Sayfanın taşmasını engelle */
+        body, html {
+            margin: 0; padding: 0; 
+            height: 100vh; width: 100vw;
+            background-color: var(--bg); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            overflow: hidden; /* Sayfanın tamamının kaymasını engelle */
+        }
+
+        .app-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; /* Tam ekran yüksekliği */
+        }
+
+        /* Üst Barı Sabitle */
+        .navbar {
+            height: 60px; 
+            min-height: 60px; /* Esnememesi için sabit tut */
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            padding: 0 25px; 
+            background: var(--surface);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 1000; /* Her zaman en üstte kal */
+        }
+
+        .logo { font-weight: 600; color: var(--accent); font-size: 1.1rem; letter-spacing: 1px; }
+        .actions { display: flex; gap: 10px; }
+
+        .btn {
+            padding: 8px 18px; border-radius: 10px; border: none; cursor: pointer;
+            font-weight: 600; font-family: inherit; transition: 0.2s;
+            display: flex; align-items: center; gap: 8px; font-size: 13px;
+        }
+
+        .btn-primary { background: var(--success); color: white; }
+        .btn-secondary { background: rgba(255,255,255,0.05); color: white; }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.2); }
+
+        /* Editör Alanı Ayarı */
+        .editor-area { 
+            flex-grow: 1; /* Kalan tüm alanı kapla */
+            position: relative;
+            overflow: hidden; /* Dış alanın kaymasını engelle */
+        }
+
+        /* CodeMirror'ın kendi iç kaydırmasını (scroll) aktifleştir */
+        .CodeMirror { 
+            height: 100% !important; 
+            font-family: 'Fira Code', monospace; 
+            font-size: 16px; 
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal { background: var(--surface); padding: 30px; border-radius: 20px; width: 320px; }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <div class="navbar">
+        <div class="logo">HTML STUDIO</div>
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="openModal()">💾 Kaydet</button>
+            <button class="btn btn-primary" onclick="runHTML()">▶ Önizleme</button>
+        </div>
+    </div>
+
+    <div class="editor-area">
+        <textarea id="editor"></textarea>
+    </div>
+</div>
+
+<div class="modal-overlay" id="overlay">
+    <div class="modal">
+        <h3 style="margin:0; color:white;">Dosya Adı</h3>
+        <input type="text" id="filename" value="index" style="width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px; background: #0f111a; border: 1px solid #333; color: white;">
+        <div style="display:flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn btn-secondary" onclick="closeModal()">İptal</button>
+            <button class="btn btn-primary" onclick="downloadFile()">İndir</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+
+<script>
+    const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+        mode: "htmlmixed",
+        theme: "material-ocean",
+        lineNumbers: true,
+        autoCloseBrackets: true
+    });
+
+    function runHTML() {
+        const code = editor.getValue();
+        const resWin = window.open('', '_blank');
+        resWin.document.write(code);
+        resWin.document.close();
+    }
+
+    const overlay = document.getElementById('overlay');
+    function openModal() { overlay.style.display = 'flex'; }
+    function closeModal() { overlay.style.display = 'none'; }
+    function downloadFile() {
+        const code = editor.getValue();
+        let name = document.getElementById('filename').value || "index";
+        if(!name.endsWith('.html')) name += '.html';
+        const blob = new Blob([code], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = name; a.click();
+        closeModal();
+    }
+</script>
+</body>
+</html>
