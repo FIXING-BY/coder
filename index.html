@@ -3,194 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixing Coder | Premium Experience</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <title>Fixing Coder | Animated</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #030303;
-            --card-bg: #0a0a0a;
-            --accent: #ffffff;
-            --text-dim: #666;
-            --transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            --bg: #050505;
+            --card: #0f0f0f;
+            --lynx: #00ffcc;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { height: 100vh; width: 100vw; background: var(--bg); color: #fff; font-family: 'Poppins', sans-serif; overflow: hidden; }
+        body { background: var(--bg); color: #fff; font-family: 'Poppins', sans-serif; overflow: hidden; }
 
-        /* Arka Plan Glow Efekti */
-        .glow-bg {
+        /* Arka Plan Hareketli Işık */
+        .bg-light {
             position: fixed;
-            top: 50%; left: 50%;
-            width: 40vw; height: 40vw;
-            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
-            transform: translate(-50%, -50%);
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 40%);
             z-index: -1;
-            filter: blur(50px);
-            animation: pulse 8s infinite alternate;
+            animation: rotateBG 20s linear infinite;
         }
 
-        @keyframes pulse {
-            from { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-            to { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
-        }
+        @keyframes rotateBG { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* --- GİRİŞ EKRANI --- */
         #welcome-screen {
             height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: var(--transition);
         }
 
         .brand-logo { 
-            font-size: 6rem; font-weight: 700; letter-spacing: -2px; 
-            margin-bottom: 5px; opacity: 0; transform: translateY(30px);
-            animation: appear 0.8s forwards 0.2s;
+            font-size: 4rem; font-weight: 600; margin-bottom: 40px; letter-spacing: -1px;
+            animation: fadeInDown 0.8s ease-out;
         }
 
-        .subtitle { 
-            color: var(--text-dim); margin-bottom: 80px; letter-spacing: 10px; 
-            text-transform: uppercase; font-size: 1rem; opacity: 0;
-            animation: appear 0.8s forwards 0.4s;
+        .grid-menu { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 20px; 
+            width: 90%; 
+            max-width: 1400px;
         }
-
-        .grid-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; width: 90%; max-width: 1400px; }
 
         .option-card {
-            background: var(--card-bg);
-            border: 1px solid #151515;
-            padding: 80px 40px;
+            background: var(--card);
+            padding: 45px 25px;
+            border-radius: 30px;
             text-align: center;
-            border-radius: 35px;
             cursor: pointer;
             transition: var(--transition);
+            border: 1px solid #1a1a1a;
             opacity: 0;
-            transform: translateY(50px);
+            animation: cardIn 0.6s forwards;
+            position: relative;
         }
 
-        /* Kartların sırayla gelmesi (Stagger) */
-        .option-card:nth-child(1) { animation: appear 0.8s forwards 0.6s; }
-        .option-card:nth-child(2) { animation: appear 0.8s forwards 0.7s; }
-        .option-card:nth-child(3) { animation: appear 0.8s forwards 0.8s; }
-        .option-card:nth-child(4) { animation: appear 0.8s forwards 0.9s; }
+        /* Kartların sırayla gelmesi */
+        .option-card:nth-child(1) { animation-delay: 0.1s; }
+        .option-card:nth-child(2) { animation-delay: 0.2s; }
+        .option-card:nth-child(3) { animation-delay: 0.3s; }
+        .option-card:nth-child(4) { animation-delay: 0.4s; }
+        .option-card:nth-child(5) { animation-delay: 0.5s; }
 
-        .option-card:hover {
-            border-color: rgba(255,255,255,0.3);
-            transform: translateY(-20px) scale(1.02);
-            background: #111;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+        /* Nefes alma animasyonu */
+        .option-card { animation: cardIn 0.6s forwards, float 4s ease-in-out infinite; }
+        .option-card:nth-child(even) { animation-delay: 0.2s, 0.5s; }
+
+        .option-card:hover { 
+            transform: translateY(-20px) scale(1.05); 
+            border-color: #555;
+            background: #151515;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .option-card h3 { font-size: 2.5rem; transition: var(--transition); }
-        .option-card:hover h3 { letter-spacing: 5px; }
+        .option-card.lynx-card { border-color: rgba(0, 255, 204, 0.2); }
+        .option-card.lynx-card:hover { border-color: var(--lynx); box-shadow: 0 0 30px rgba(0, 255, 204, 0.1); }
+        .option-card.lynx-card h3 { color: var(--lynx); }
 
-        @keyframes appear {
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .option-card h3 { font-size: 1.8rem; margin-bottom: 15px; transition: 0.3s; }
+        .option-card:hover h3 { letter-spacing: 2px; }
+        .option-card p { font-size: 0.85rem; color: #777; line-height: 1.5; transition: 0.3s; }
+        .option-card:hover p { color: #bbb; }
 
-        /* --- FULL EKRAN APP --- */
+        /* Uygulama Ekranı (Slide ve Fade) */
         #app-screen {
             position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             background: #fff;
-            clip-path: circle(0% at 50% 50%); /* Dairesel açılış animasyonu */
+            transform: translateX(100%);
             z-index: 100;
-            transition: clip-path 1s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: 0.7s cubic-bezier(0.85, 0, 0.15, 1);
         }
+        #app-screen.active { transform: translateX(0); }
 
-        #app-screen.active { clip-path: circle(150% at 50% 50%); }
-
+        /* Sol Alt Menü Tuşu (Dönen Tip) */
         .close-btn {
             position: fixed;
-            top: 40px; right: 40px;
-            width: 70px; height: 70px;
-            background: #000;
+            bottom: 25px; left: 25px;
+            width: 40px; height: 40px;
+            background: rgba(0, 0, 0, 0.8);
             color: #fff;
-            border-radius: 50%;
+            border-radius: 12px;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; z-index: 200; font-size: 28px;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            cursor: pointer; z-index: 200; font-size: 18px;
+            border: 1px solid #333;
+            transition: 0.4s;
         }
 
-        .close-btn:hover { transform: scale(1.1) rotate(90deg); }
+        .close-btn:hover { 
+            transform: rotate(180deg) scale(1.1); 
+            background: var(--lynx); 
+            color: #000; 
+            border-color: var(--lynx);
+        }
 
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Ekran Geçiş Efekti (Kararma) */
-        .dim #welcome-screen { opacity: 0; transform: scale(0.9); }
+        /* Animasyon Tanımları */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 
+            0%, 100% { transform: translateY(0); } 
+            50% { transform: translateY(-10px); } 
+        }
     </style>
 </head>
 <body>
 
-    <div class="glow-bg"></div>
+    <div class="bg-light"></div>
 
     <div id="welcome-screen">
         <h1 class="brand-logo">FIXING CODER</h1>
-        <p class="subtitle">System Ready</p>
         
         <div class="grid-menu">
             <div class="option-card" onclick="launch('c.txt', 'c')">
                 <h3>C</h3>
-                <span>Open Core</span>
+                <p>Donanıma en yakın, en hızlı sistem dili.</p>
             </div>
+
             <div class="option-card" onclick="launch('html.txt', 'html')">
                 <h3>HTML</h3>
-                <span>Launch Page</span>
+                <p>İnternet dünyasının standart arayüz yapısı.</p>
             </div>
+
+            <div class="option-card lynx-card" onclick="launch('lynx.txt', 'lynx')">
+                <h3>LYNX</h3>
+                <p>Fixing'in özgün, Türkçe tabanlı yeni web dili.</p>
+            </div>
+
             <div class="option-card" onclick="launch('java.txt', 'java')">
                 <h3>JAVA</h3>
-                <span>Run Logic</span>
+                <p>Büyük sistemler için sarsılmaz nesne mimarisi.</p>
             </div>
+
             <div class="option-card" onclick="launch('pythone.txt', 'pythone')">
                 <h3>PYTHON</h3>
-                <span>Execute AI</span>
+                <p>Yapay zeka ve verinin en kısa yolu.</p>
             </div>
         </div>
     </div>
 
     <div id="app-screen">
-        <div class="close-btn" onclick="closeApp()">✕</div>
+        <div class="close-btn" onclick="closeApp()">☰</div>
         <iframe id="live-frame"></iframe>
     </div>
 
     <script>
         const app = document.getElementById('app-screen');
         const frame = document.getElementById('live-frame');
-        const body = document.body;
 
         function launch(file, slug) {
-            fetch(file)
-                .then(res => res.text())
-                .then(code => {
-                    const blob = new Blob([code], { type: 'text/html' });
-                    frame.src = URL.createObjectURL(blob);
-                    
-                    // Geçiş animasyonlarını tetikle
-                    body.classList.add('dim');
-                    app.classList.add('active');
-
-                    // URL Değiştirme
-                    window.history.pushState({page: slug}, "", "/" + slug);
-                    document.title = "Fixing Coder | " + slug.toUpperCase();
-                })
-                .catch(() => alert("Error: File not accessible."));
+            fetch(file).then(res => res.text()).then(code => {
+                const blob = new Blob([code], { type: 'text/html' });
+                frame.src = URL.createObjectURL(blob);
+                app.classList.add('active');
+                window.history.pushState({page: slug}, "", "/" + slug);
+                document.title = "Fixing Coder | " + slug.toUpperCase();
+            }).catch(() => alert("Dosya yüklenemedi."));
         }
 
         function closeApp() {
             app.classList.remove('active');
-            body.classList.remove('dim');
-            
-            // URL Sıfırlama
             window.history.pushState({page: "home"}, "", "/");
             document.title = "Fixing Coder";
-            
-            setTimeout(() => { frame.src = "about:blank"; }, 1000);
+            setTimeout(() => { frame.src = "about:blank"; }, 700);
         }
 
+        // Geri tuşu desteği
         window.onpopstate = (e) => {
             if (e.state && e.state.page !== "home") launch(e.state.page + ".txt", e.state.page);
             else closeApp();
