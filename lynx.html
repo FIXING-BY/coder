@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>LYNX </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material-ocean.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --lynx: #00ffcc; --bg: #0f111a; }
+        body, html { margin: 0; padding: 0; height: 100vh; background: var(--bg); overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .app-wrapper { display: flex; flex-direction: column; height: 100vh; }
+        .navbar { height: 60px; background: #1a1b26; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; border-bottom: 2px solid var(--lynx); }
+        .logo { color: var(--lynx); font-weight: bold; letter-spacing: 2px; font-size: 1.2rem; }
+        .btn-run { background: var(--lynx); color: #0f111a; border: none; padding: 10px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-run:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--lynx); }
+        .editor-area { flex-grow: 1; position: relative; }
+        .CodeMirror { height: 100% !important; font-size: 16px; font-family: 'Fira Code', monospace; }
+
+        /* LYNX Editör İçi Özel Renkler */
+        .cm-lynx-f { color: #ff007c !important; font-weight: bold; }
+        .cm-lynx-cmd-yazi { color: #89ddff !important; }
+        .cm-lynx-cmd-resim { color: #ff9f0a !important; }
+        .cm-lynx-cmd-bekle { color: #c792ea !important; }
+        .cm-lynx-cmd-arka { color: #f78c6c !important; }
+        .cm-lynx-cmd-tus { color: #addb67 !important; }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <div class="navbar">
+        <div class="logo">LYNX </div>
+        <button class="btn-run" onclick="runLynxSequence()">YENİ SEKMEDE BAŞLAT ▶</button>
+    </div>
+    <div class="editor-area">
+        <textarea id="editor">
+F arka plan siyah
+F yazı LYNX Editör Hazır Fixing sunar beyaz
+F bekle 1500
+F resim https://files.catbox.moe/up64xq.png
+F bekle 2000
+F arka plan lacivert
+F yazı Fixing Arama Motoru'na Gidin turuncu
+F tuş pembe https://fixing-by.github.io/search/</textarea>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+
+<script>
+    // LYNX Syntax Highlighter
+    CodeMirror.defineMode("lynx", function() {
+        return {
+            token: function(stream) {
+                if (stream.match(/^F\s/)) return "lynx-f";
+                if (stream.match(/yazı/)) return "lynx-cmd-yazi";
+                if (stream.match(/resim/)) return "lynx-cmd-resim";
+                if (stream.match(/bekle/)) return "lynx-cmd-bekle";
+                if (stream.match(/arka plan/)) return "lynx-cmd-arka";
+                if (stream.match(/tuş/)) return "lynx-cmd-tus";
+                stream.next();
+                return null;
+            }
+        };
+    });
+
+    const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+        mode: "lynx",
+        theme: "material-ocean",
+        lineNumbers: true
+    });
+
+    // Genişletilmiş 30+ Renk Paleti
+    const lynxColors = {
+        "kırmızı": "#ff453a", "mavi": "#0a84ff", "yeşil": "#32d74b", "sarı": "#ffd60a",
+        "mor": "#bf5af2", "pembe": "#ff375f", "turuncu": "#ff9f0a", "gri": "#8e8e93",
+        "beyaz": "#ffffff", "siyah": "#000000", "lacivert": "#003366", "turkuaz": "#40e0d0",
+        "altın": "#ffd700", "gümüş": "#c0c0c0", "pembe": "#ff007c", "lila": "#c8a2c8",
+        "mercan": "#ff7f50", "indigo": "#4b0082", "nane": "#98ff98", "safir": "#0f52ba",
+        "zümrüt": "#50c878", "vişne": "#800000", "lavanta": "#e6e6fa", "fuşya": "#ff00ff"
+    };
+
+    async function runLynxSequence() {
+        const lines = editor.getValue().split('\n');
+        const resWin = window.open('', '_blank');
+        
+        resWin.document.write(`
+            <html>
+            <head>
+                <title>LYNX Output</title>
+                <style>
+                    body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: sans-serif; transition: background 0.5s ease; overflow: hidden; }
+                    .lynx-el { margin: 15px; text-align: center; animation: fadeIn 0.5s ease; }
+                    img { max-width: 80%; max-height: 60vh; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 3px solid #fff; }
+                    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                </style>
+            </head>
+            <body id="stage"></body>
+            </html>
+        `);
+
+        const stage = resWin.document.getElementById('stage');
+
+        for (let line of lines) {
+            const parts = line.trim().split(' ');
+            if (parts[0] !== 'F' || parts.length < 2) continue;
+
+            const command = parts[1];
+
+            if (command === 'yazı') {
+                const colorKey = parts[parts.length - 1];
+                const color = lynxColors[colorKey] || '#ffffff';
+                const text = parts.slice(2, -1).join(' ');
+                stage.innerHTML += `<div class="lynx-el" style="color:${color}; font-size:40px; font-weight:bold;">${text}</div>`;
+            }
+            else if (command === 'arka' && parts[2] === 'plan') {
+                const colorKey = parts[3];
+                stage.style.backgroundColor = lynxColors[colorKey] || '#0f111a';
+            }
+            else if (command === 'resim') {
+                const imgLink = parts[2];
+                stage.innerHTML += `<div class="lynx-el"><img src="${imgLink}"></div>`;
+            }
+            else if (command === 'tuş') {
+                const colorKey = parts[2];
+                const color = lynxColors[colorKey] || '#ff007c';
+                const link = parts[3];
+                stage.innerHTML += `<a href="${link.startsWith('http') ? link : 'https://' + link}" target="_blank" style="display:inline-block; padding:15px 35px; background:${color}; color:white; text-decoration:none; border-radius:12px; font-weight:bold; margin:10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">Tıkla ve Git</a>`;
+            }
+            else if (command === 'bekle') {
+                const ms = parseInt(parts[2]) || 1000;
+                await new Promise(r => setTimeout(r, ms));
+                stage.innerHTML = '';
+            }
+        }
+    }
+</script>
+</body>
+</html>
