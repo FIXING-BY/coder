@@ -30,6 +30,7 @@
             height: 60px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 25px; background: var(--surface);
             border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0; /* Menünün ezilmesini/kaybolmasını engeller */
         }
 
         .logo { font-weight: 600; color: var(--accent); font-size: 1.1rem; }
@@ -44,7 +45,10 @@
         .btn-primary { background: var(--success); color: #0f111a; }
         .btn-secondary { background: rgba(255,255,255,0.05); color: white; }
 
-        .editor-area { flex-grow: 1; }
+        .editor-area { 
+            flex-grow: 1; 
+            overflow: hidden; /* Editörün sayfayı taşırmasını engeller */
+        }
         .CodeMirror { height: 100% !important; font-family: 'Fira Code', monospace; font-size: 16px; }
 
         /* Modal */
@@ -116,8 +120,23 @@ print(50 * 2)</textarea>
             `);
             resWin.document.close();
         } catch (err) {
+            // Hataları Türkçeye Çevirme
+            let trErr = err.toString()
+                .replace(/Traceback \(most recent call last\):/g, "Hata İzleme Kaydı (son çağrıdan geriye doğru):")
+                .replace(/File "<exec>", line (\d+)/g, "$1. satırda hata")
+                .replace(/line (\d+)/g, "satır $1")
+                .replace(/SyntaxError:/g, "Sözdizimi Hatası (SyntaxError):")
+                .replace(/NameError:/g, "İsim Hatası (NameError):")
+                .replace(/TypeError:/g, "Tür Hatası (TypeError):")
+                .replace(/ValueError:/g, "Değer Hatası (ValueError):")
+                .replace(/IndentationError:/g, "Girinti Hatası (IndentationError):")
+                .replace(/IndexError:/g, "Dizin Hatası (IndexError):")
+                .replace(/KeyError:/g, "Anahtar Hatası (KeyError):")
+                .replace(/AttributeError:/g, "Nitelik Hatası (AttributeError):")
+                .replace(/ZeroDivisionError:/g, "Sıfıra Bölme Hatası (ZeroDivisionError):");
+
             const errWin = window.open('', '_blank');
-            errWin.document.write(`<body style="background:#1a1b26; color:#f7768e; font-family:monospace; padding:20px;">${err}</body>`);
+            errWin.document.write(`<body style="background:#1a1b26; color:#f7768e; font-family:monospace; padding:20px; white-space:pre-wrap;">${trErr}</body>`);
             errWin.document.close();
         }
     }
